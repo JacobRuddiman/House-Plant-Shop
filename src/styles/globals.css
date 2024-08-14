@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -31,3 +31,14 @@ body {
     text-wrap: balance;
   }
 }
+
+.custom-badge {
+  padding: 0.5em 0.75em;  /* Adjust padding as needed */
+  min-height: 36px;  /* Ensure it's tall enough */
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
