@@ -13,7 +13,7 @@ interface PlantCardProps {
   count: number;
   imageUrl: string;
   rating: number;
-  id: number; // Add this to identify the product
+  id: number;
 }
 
 const PlantCard: React.FC<PlantCardProps> = ({
@@ -51,47 +51,49 @@ const PlantCard: React.FC<PlantCardProps> = ({
   };
 
   return (
-    <Link href={`/product/${id}`} passHref>
-      <div className="card bg-base-100 shadow-xl h-full cursor-pointer">
-        <figure>
-          <img src={imageUrl} alt={commonName} className="object-contain" />
+    <div className="card bg-base-100 shadow-xl h-full cursor-pointer">
+      <Link href={`/product/${id}`} passHref>
+        <figure className="cursor-pointer">
+          <img src={imageUrl} alt={commonName} className="object-contain w-full" />
         </figure>
-        <div className="card-body p-4 flex flex-col justify-between">
-          <div>
-            <h2 className="card-title flex-col items-start">
-              <div className="flex-row flex justify-between w-full">
+      </Link>
+      <div className="card-body p-4 flex flex-col justify-between">
+        <div>
+          <h2 className="card-title flex-col items-start">
+            <Link href={`/product/${id}`} passHref>
+              <div className="flex-row flex justify-between w-full cursor-pointer">
                 <div>{commonName}</div>
                 <div className={`badge ${badgeColor} custom-badge flex-col items-center text-center ml-auto`}>
                   <span className="badge-count">{stockMessage}</span>
                 </div>
               </div>
-              <div className="text-base">
-                ({scientificName})
-              </div>
-            </h2>
-          </div>
-          <div className="flex justify-between items-center mt-4">
-            <div>
-              <p className="text-lg font-semibold">${price}</p>
-              {discountPrice < price && (
-                <p className="text-sm text-gray-500 line-through">${discountPrice}</p>
-              )}
+            </Link>
+            <div className="text-base">
+              ({scientificName})
             </div>
-            <Link href={`/shop?genus=${genus}`} passHref>
-              <div className="badge badge-outline cursor-pointer">{genus}</div>
-            </Link>
+          </h2>
+        </div>
+        <div className="flex justify-between items-center mt-4">
+          <div>
+            <p className="text-lg font-semibold">${price}</p>
+            {discountPrice < price && (
+              <p className="text-sm text-gray-500 line-through">${discountPrice}</p>
+            )}
           </div>
-          <div className="mt-4 flex items-center justify-between">
-            <Link href={`/product/${id}#reviews`} passHref>
-              <div className="flex items-center cursor-pointer">
-                {renderStars(rating)}
-                <span className="text-sm text-gray-500 ml-2">{rating.toFixed(1)}</span>
-              </div>
-            </Link>
-          </div>
+          <Link href={`/shop?genus=${genus}`} passHref>
+            <div className="badge badge-outline cursor-pointer">{genus}</div>
+          </Link>
+        </div>
+        <div className="mt-4 flex items-center justify-between">
+          <Link href={`/product/${id}#reviews`} passHref>
+            <div className="flex items-center cursor-pointer">
+              {renderStars(rating)}
+              <span className="text-sm text-gray-500 ml-2">{rating.toFixed(1)}</span>
+            </div>
+          </Link>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

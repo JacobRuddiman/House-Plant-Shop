@@ -34,6 +34,7 @@ const PlantGrid = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+
     const fetchPlants = async () => {
       const { plants, error } = await getPlants({ sort, order, genus, minPrice, maxPrice });
 
@@ -41,6 +42,7 @@ const PlantGrid = () => {
         console.error("Error fetching plants:", error);
         setError(error);
       } else if (plants) {
+        console.log("CLIENT GETPLANTS IN GRID:", plants)
         setPlants(plants);
       }
     };

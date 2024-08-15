@@ -1,73 +1,80 @@
-"use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getGenuses } from '@/server/plants';
+import { debounce } from 'lodash';
 
 const FilterBar: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const initialGenus = searchParams.get('genus') || 'All';
-  const initialMinPrice = searchParams.get('minPrice') || '';
-  const initialMaxPrice = searchParams.get('maxPrice') || '';
+  const getInitialFilters = () => ({
+    genus: searchParams.get('genus') || 'All',
+    minPrice: searchParams.get('minPrice') || '',
+    maxPrice: searchParams.get('maxPrice') || '',
+  });
 
-  const [genus, setGenus] = useState(initialGenus);
-  const [minPrice, setMinPrice] = useState(initialMinPrice);
-  const [maxPrice, setMaxPrice] = useState(initialMaxPrice);
-  const [genuses, setGenuses] = useState<string[]>([]);
+  const [filters, setFilters] = useState<{ [key: string]: string }>(getInitialFilters());
+  const [genuses, setGenuses] = useState<string[]>(['All']);
 
-  useEffect(() => {
-    async function fetchGenuses() {
-      console.log("Fetching genuses...");
-      try {
-        console.log("Genus fetch attemt")
-        const response = await getGenuses();
-        console.log("Genuses fetched:", response);  
-        if (response.genuses) {
-          console.log("Updating state with genuses:", response.genuses);
-          setGenuses(['All', ...response.genuses]);
-        } else {
-          console.error("No genuses in response", response);
-        }
-      } catch (error) {
-        console.error("Failed to fetch genuses:", error);
-      }
+  const fetchGenuses = useCallback(async () => {
+    console.log("Fetching genuses...");
+    try {
+      const response = await getGenuses();
+      const fetchedGenuses = response.genuses || [];
+      console.log("Genuses fetched:", fetchedGenuses);
+      setGenuses(['All', ...fetchedGenuses]);
+    } catch (error) {
+      console.error("Failed to fetch genuses:", error);
+      setGenuses(['All']);
     }
-    
-    
-    fetchGenuses();
   }, []);
 
   useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (genus !== 'All') {
-      params.set('genus', genus);
-    } else {
-      params.delete('genus');
-    }
-    if (minPrice) {
-      params.set('minPrice', minPrice);
-    } else {
-      params.delete('minPrice');
-    }
-    if (maxPrice) {
-      params.set('maxPrice', maxPrice);
-    } else {
-      params.delete('maxPrice');
-    }
+    fetchGenuses();
+  }, [searchParams]); // Fetch on mount
+
+  useEffect(() => {
+    setFilters(getInitialFilters()); // Update filters when searchParams change
+  }, [searchParams]);
+
+  const updateURL = useCallback((newFilters) => {
+    const params = new URLSearchParams();
+    Object.entries(newFilters).forEach(([key, value]) => {
+      if (value && value !== 'All') {
+        params.set(key, value);
+      }
+    });
     router.push(`/shop?${params.toString()}`);
-  }, [genus, minPrice, maxPrice]);
+    console.log("CLIENT Updating URL");
+  }, [router]);
+
+  const handleChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const newValue = event.target.value;
+    setFilters(prev => {
+      const newFilters = { ...prev, [field]: newValue };
+      if (field === 'genus') {
+        updateURL(newFilters); // Update URL immediately with new filters
+      }
+      return newFilters;
+    });
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      updateURL(filters); // Only update URL on Enter for price inputs
+    }
+  };
 
   return (
     <div className="flex flex-col space-y-4 my-8 px-4">
       <div>
         <label className="block mb-2">Genus:</label>
         <select
-          value={genus}
-          onChange={(e) => setGenus(e.target.value)}
+          value={filters.genus}
+          onChange={handleChange('genus')}
           className="input input-bordered w-full h-8"
         >
-          {genuses.map((g) => (
+          {genuses.map(g => (
             <option key={g} value={g}>{g}</option>
           ))}
         </select>
@@ -77,17 +84,19 @@ const FilterBar: React.FC = () => {
         <div className="flex space-x-2">
           <input
             type="number"
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
+            value={filters.minPrice}
+            onChange={handleChange('minPrice')}
             className="input input-bordered w-full h-8"
             placeholder="Min"
+            onKeyPress={handleKeyPress}
           />
           <input
             type="number"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
+            value={filters.maxPrice}
+            onChange={handleChange('maxPrice')}
             className="input input-bordered w-full h-8"
             placeholder="Max"
+            onKeyPress={handleKeyPress}
           />
         </div>
       </div>

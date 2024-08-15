@@ -1,6 +1,5 @@
 "use server";
 
-import { chownSync } from 'fs';
 import prisma from '../lib/prisma';
 
 interface CreatePlantInput {
@@ -51,6 +50,7 @@ export async function getPlants(params: GetPlantsInput = {}) {
       orderBy[sort] = order;
     }
 
+    console.log("SERVER GETPLANTS:", query)
 
     const plants = await prisma.plant.findMany({
       where: query,
@@ -121,6 +121,7 @@ export async function getGenuses() {
       select: { genus: true },
     });
     const genusNames = genuses.map(plant => plant.genus).sort();
+    console.log("SERVER GETGENUSES:", {genuses : genusNames})
     return { genuses: genusNames };
   } catch (error) {
     console.error("Server: Error fetching genuses:", error);
@@ -229,7 +230,6 @@ export async function getRelatedPlants(genus: string, price: number, maxRelatedP
     // Shuffle the combined list
     const shuffledPlants = shuffleArray(allRelatedPlants);
     console.log(`Returning ${shuffledPlants.length} plants after shuffling`);
-    console.log("SERVER:", allRelatedPlants);
 
     return shuffledPlants;
   } catch (error) {
