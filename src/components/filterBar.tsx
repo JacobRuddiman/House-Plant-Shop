@@ -52,9 +52,6 @@ const FilterBar: React.FC = () => {
     const newValue = event.target.value;
     setFilters(prev => {
       const newFilters = { ...prev, [field]: newValue };
-      if (field === 'genus') {
-        updateURL(newFilters); // Update URL immediately with new filters
-      }
       return newFilters;
     });
   };
@@ -65,13 +62,17 @@ const FilterBar: React.FC = () => {
     }
   };
 
+  const handleUpdateClick = () => {
+    updateURL(filters); // Update URL when the update button is clicked
+  };
+
   return (
     <div className="flex flex-col space-y-4 my-8 px-4">
       <div>
         <label className="block mb-2">Genus:</label>
         <select
           value={filters.genus}
-          onChange={handleChange('genus')}
+          onChange={(e) => handleChange('genus')(e)}
           className="input input-bordered w-full h-8"
         >
           {genuses.map(g => (
@@ -85,7 +86,7 @@ const FilterBar: React.FC = () => {
           <input
             type="number"
             value={filters.minPrice}
-            onChange={handleChange('minPrice')}
+            onChange={(e) => handleChange('minPrice')(e)}
             className="input input-bordered w-full h-8"
             placeholder="Min"
             onKeyPress={handleKeyPress}
@@ -93,13 +94,19 @@ const FilterBar: React.FC = () => {
           <input
             type="number"
             value={filters.maxPrice}
-            onChange={handleChange('maxPrice')}
+            onChange={(e) => handleChange('maxPrice')(e)}
             className="input input-bordered w-full h-8"
             placeholder="Max"
             onKeyPress={handleKeyPress}
           />
         </div>
       </div>
+      <button
+        onClick={handleUpdateClick}
+        className="btn mt-4"
+      >
+        Update
+      </button>
     </div>
   );
 };
