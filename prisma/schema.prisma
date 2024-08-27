@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Plant {
+  id             Int      @id @default(autoincrement())
+  scientificName String
+  commonName     String
+  genus          String
+  species        String
+  description    String
+  price          Float
+  discountPrice  Float
+  count          Int
+  images         Image[]  // Relationship to Image model
+  rating         Float
+}
+
+model Image {
+  id        Int    @id @default(autoincrement())
+  url       String
+  plantId   Int?
+  plant     Plant?  @relation(fields: [plantId], references: [id])
+}
