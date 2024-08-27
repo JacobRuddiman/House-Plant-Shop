@@ -32,7 +32,8 @@ const ProductPage = () => {
   useEffect(() => {
     const fetchPlant = async () => {
       try {
-        const plantData = await getPlant(parseInt(params.id, 10));
+        const id = Array.isArray(params.id) ? params.id[0] : params.id; // Ensure id is a string
+        const plantData = await getPlant(parseInt(id, 10));
         setPlant(plantData);
       } catch (error) {
         setError('Plant not found');

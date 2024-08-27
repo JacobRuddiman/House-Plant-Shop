@@ -45,7 +45,7 @@ const PromotedPlants: React.FC = () => {
           <div className="flex w-max animate-scroll">
             {plantsToShow.map((plant, index) => (
               <div key={index} className="flex-shrink-0 w-60 mx-2">
-                <PlantCard {...plant} />
+                <PlantCard rating={0} {...plant} />
               </div>
             ))}
           </div>

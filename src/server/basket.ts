@@ -1,11 +1,20 @@
-// /app/actions/basketActions.js
+// /app/actions/basketActions.ts
 "use server";
 import { cookies } from 'next/headers';
+
+// Define the Item interface
+interface Item {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  // Add any other relevant properties for your items
+}
 
 /**
  * Fetch the current basket from cookies.
  */
-export async function getBasket() {
+export async function getBasket(): Promise<Item[]> {
   const cookieStore = cookies();
   const basketCookie = cookieStore.get('basket');
   const basket = basketCookie ? JSON.parse(basketCookie.value) : [];
@@ -14,9 +23,9 @@ export async function getBasket() {
 
 /**
  * Add an item to the basket and update cookies.
- * @param {Object} item - The item to add to the basket.
+ * @param {Item} item - The item to add to the basket.
  */
-export async function addToBasket(item) {
+export async function addToBasket(item: Item): Promise<number> {
   const cookieStore = cookies();
   const basket = await getBasket();
 
@@ -38,7 +47,7 @@ export async function addToBasket(item) {
  * Remove an item from the basket by ID and update cookies.
  * @param {number} itemId - The ID of the item to remove from the basket.
  */
-export async function removeFromBasket(itemId) {
+export async function removeFromBasket(itemId: number): Promise<number> {
   const cookieStore = cookies();
   let basket = await getBasket();
 
@@ -59,7 +68,7 @@ export async function removeFromBasket(itemId) {
 /**
  * Clear the entire basket and update cookies.
  */
-export async function clearBasket() {
+export async function clearBasket(): Promise<number> {
   const cookieStore = cookies();
 
   // Clear the basket by setting an empty array

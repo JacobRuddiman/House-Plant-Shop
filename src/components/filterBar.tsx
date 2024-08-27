@@ -6,7 +6,7 @@ const FilterBar: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const getInitialFilters = () => ({
+  const getInitialFilters = (): { [key: string]: string } => ({
     genus: searchParams.get('genus') || 'All',
     minPrice: searchParams.get('minPrice') || '',
     maxPrice: searchParams.get('maxPrice') || '',
@@ -30,13 +30,13 @@ const FilterBar: React.FC = () => {
 
   useEffect(() => {
     fetchGenuses();
-  }, [searchParams]); // Fetch on mount
+  }, [fetchGenuses]); // Fetch on mount
 
   useEffect(() => {
     setFilters(getInitialFilters()); // Update filters when searchParams change
   }, [searchParams]);
 
-  const updateURL = useCallback((newFilters) => {
+  const updateURL = useCallback((newFilters: { [key: string]: string }) => {
     const params = new URLSearchParams();
     Object.entries(newFilters).forEach(([key, value]) => {
       if (value && value !== 'All') {
