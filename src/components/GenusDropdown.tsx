@@ -33,9 +33,9 @@ const GenusDropdown: React.FC<GenusDropdownProps> = () => {
   }
 
   return (
-    <div className="dropdown relative">
+    <div className="dropdown relative text-black">
       <div
-        className={`cursor-pointer p-2 ${dropdownOpen ? 'bg-white text-black rounded-t-md border-b border-gray-300' : 'text-black'} no-hover`}
+        className={`cursor-pointer p-2 ${dropdownOpen ? 'bg-white rounded-t-md border-b border-gray-300' : 'text-white'} no-hover`}
         onClick={() => setDropdownOpen(!dropdownOpen)}
       >
         Select Genus

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getGenuses } from '@/server/plants';
-import { debounce } from 'lodash';
 
 const FilterBar: React.FC = () => {
   const router = useRouter();

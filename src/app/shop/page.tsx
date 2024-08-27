@@ -8,7 +8,7 @@ import PlantGrid from '@/components/plantGrid';
 const ShopPage: React.FC = () => {
   return (
     <div className="container flex">
-      <div className="w-1/6 mr-4 bg-secondary">
+      <div className="w-1/6 mr-4 bg-secondary h-screen">
         <FilterBar />
       </div>
       <div className="w-full">

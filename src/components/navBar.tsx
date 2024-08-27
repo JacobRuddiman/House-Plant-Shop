@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import GenusDropdown from './GenusDropdown';
+import BasketIcon from './basketIcon';
 
 const NavBar = () => {
   return (
@@ -10,7 +11,7 @@ const NavBar = () => {
           <img src="/images/logoplant.png" className ="h-full object-contain" alt="Logo"/>
         </Link>
       </div>
-      <div className="flex-none">
+      <div className="flex-none text-white">
         <ul className="menu menu-horizontal p-0 items-center text-base">
           <GenusDropdown/>
           <li><Link href="/shop">Offers</Link></li>
@@ -21,7 +22,9 @@ const NavBar = () => {
               <input type="text" placeholder="Search" className="input input-bordered h-9" />
             </div>
           </li>
-          <li><Link href="/cart">Basket</Link></li>
+          <li>
+            <BasketIcon/>
+          </li>
         </ul>
       </div>
     </nav>
