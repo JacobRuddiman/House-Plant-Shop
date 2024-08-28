@@ -4,9 +4,7 @@ import prisma from '../lib/prisma';
 import { v2 as cloudinary, UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
 
 
-interface CreateImageInput {
-  formData: FormData;
-}
+
 
 export async function createImage(formData: FormData) {
   try {
@@ -19,6 +17,8 @@ export async function createImage(formData: FormData) {
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+
+
 
     // Upload the image to Cloudinary
     const uploadResult: UploadApiResponse = await new Promise((resolve, reject) => {
