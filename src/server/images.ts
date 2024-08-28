@@ -1,13 +1,8 @@
 "use server";
 
 import prisma from '../lib/prisma';
-import path from 'path';
-import fs from 'fs';
-import { v4 as uuidv4 } from 'uuid';
+import { v2 as cloudinary, UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
 
-async function saveFileToDisk(file: Buffer, filePath: string) {
-  fs.writeFileSync(filePath, file);
-}
 
 interface CreateImageInput {
   formData: FormData;
@@ -25,23 +20,25 @@ export async function createImage(formData: FormData) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Define the directory and file path
-    const directory = path.join(process.cwd(), 'public', 'images');
-    const fileName = `${uuidv4()}${path.extname(filename)}`;
-    const filePath = path.join(directory, fileName);
+    // Upload the image to Cloudinary
+    const uploadResult: UploadApiResponse = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: 'your_folder_name' }, // Specify a folder in Cloudinary
+        (error: UploadApiErrorResponse | null, result: UploadApiResponse | undefined) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result as UploadApiResponse);
+          }
+        }
+      );
+      uploadStream.end(buffer);
+    });
 
-    // Ensure the directory exists
-    if (!fs.existsSync(directory)) {
-      fs.mkdirSync(directory, { recursive: true });
-    }
+    // Get the URL of the uploaded image
+    const url = uploadResult.secure_url;
 
-    // Save the file to disk
-    await saveFileToDisk(buffer, filePath);
-
-    // Create the URL
-    const url = `/images/${fileName}`;
-
-    // Insert into the database
+    // Insert the image URL into the database
     const newImage = await prisma.image.create({
       data: {
         url,
@@ -54,6 +51,7 @@ export async function createImage(formData: FormData) {
     throw new Error('Failed to create image');
   }
 }
+
 
 interface UpdateImagePlantIdInput {
   imageId: number;
@@ -75,10 +73,23 @@ export async function updateImagePlantId({ imageId, plantId }: UpdateImagePlantI
 
 export async function deleteImage(id: number) {
   try {
-    await prisma.image.delete({
-      where: { id },
-    });
-    return { message: 'Image deleted successfully' };
+    // Fetch the image URL from the database to get the public_id
+    const image = await prisma.image.findUnique({ where: { id } });
+
+    if (image) {
+      // Extract the public_id from the Cloudinary URL (assuming it's stored)
+      const publicId = image.url.split('/').slice(-1)[0].split('.')[0];
+
+      // Delete the image from Cloudinary
+      await cloudinary.uploader.destroy(publicId);
+
+      // Delete the image record from the database
+      await prisma.image.delete({ where: { id } });
+
+      return { message: 'Image deleted successfully' };
+    } else {
+      throw new Error('Image not found');
+    }
   } catch (error) {
     console.error('Failed to delete image', error);
     throw new Error('Failed to delete image');
