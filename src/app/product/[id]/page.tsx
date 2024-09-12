@@ -5,7 +5,8 @@ import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import { getPlant, getRelatedPlants } from "@/server/plants";
 import { useParams } from 'next/navigation';
 import ImageGallery from '@/components/productImageGallery';
-import PlantCard from '@/components/plantCard'; // Assuming you have this component
+import PlantCard from '@/components/plantCard';
+import PlantReviews from '@/components/plantReviews';
 
 interface Plant {
   id: number;
@@ -19,6 +20,7 @@ interface Plant {
   count: number;
   images: { id: number; url: string; plantId: number | null }[];
   rating: number;
+  isDiscounted: boolean; // Add isDiscounted property to Plant
 }
 
 const ProductPage = () => {
@@ -32,7 +34,7 @@ const ProductPage = () => {
   useEffect(() => {
     const fetchPlant = async () => {
       try {
-        const id = Array.isArray(params.id) ? params.id[0] : params.id; // Ensure id is a string
+        const id = Array.isArray(params.id) ? params.id[0] : params.id;
         const plantData = await getPlant(parseInt(id, 10));
         setPlant(plantData);
       } catch (error) {
@@ -168,10 +170,14 @@ const ProductPage = () => {
               count={relatedPlant.count}
               imageUrl={imageUrl}
               rating={relatedPlant.rating}
+              isDiscounted={relatedPlant.discountPrice < relatedPlant.price} // Add isDiscounted
             />
           );
         })}
         </div>
+      </section>
+      <section>
+        <PlantReviews plantId={plant.id}/>
       </section>
 
     </div>

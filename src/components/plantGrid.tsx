@@ -18,6 +18,7 @@ interface Plant {
   rating: number;
   imageUrl: string;
   images: { id: number; url: string; plantId: number | null }[];
+  isDiscounted: boolean; // Ensure isDiscounted is part of the Plant interface
 }
 
 const PlantGrid = () => {
@@ -27,8 +28,7 @@ const PlantGrid = () => {
   const genus = searchParams.get('genus') || '';
   const minPrice = parseFloat(searchParams.get('minPrice') || '');
   const maxPrice = parseFloat(searchParams.get('maxPrice') || '');
-
-
+  const isDiscounted = searchParams.get('isDiscounted') === 'true';  // New token for discounted plants
 
   const [plants, setPlants] = useState<Plant[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -36,19 +36,19 @@ const PlantGrid = () => {
   useEffect(() => {
 
     const fetchPlants = async () => {
-      const { plants, error } = await getPlants({ sort, order, genus, minPrice, maxPrice });
+      const { plants, error } = await getPlants({ sort, order, genus, minPrice, maxPrice, isDiscounted });
 
       if (error) {
         console.error("Error fetching plants:", error);
         setError(error);
       } else if (plants) {
-        console.log("CLIENT GETPLANTS IN GRID:", plants)
+        console.log("CLIENT GETPLANTS IN GRID:", plants);
         setPlants(plants);
       }
     };
 
     fetchPlants();
-  }, [sort, order, genus, minPrice, maxPrice]);
+  }, [sort, order, genus, minPrice, maxPrice, isDiscounted]);
 
   if (error) {
     return <div>Error fetching plants: {error}</div>;
@@ -61,11 +61,10 @@ const PlantGrid = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="flex">
-
-        <div >
+        <div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {plants.map((plant: Plant) => (
-              <PlantCard key={plant.id} {...plant} />
+              <PlantCard key={plant.id} {...plant} isDiscounted={plant.isDiscounted} />
             ))}
           </div>
         </div>

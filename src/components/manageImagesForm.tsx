@@ -32,7 +32,7 @@ const ManageImagesForm: React.FC = () => {
           <input
             type="file"
             onChange={(e) => setImageFile(e.target.files ? e.target.files[0] : null)}
-            className="input input-bordered w-full"
+            className="input input-bordered w-full h-full py-4"
           />
         </div>
         <div className="form-control">

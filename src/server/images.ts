@@ -104,3 +104,36 @@ export async function getImages() {
     return { error: 'Failed to fetch images' };
   }
 }
+
+
+
+export async function syncDatabaseWithCloudinary() {
+  try {
+    // Get all images from Cloudinary
+    const cloudinaryResult = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'your_folder_name/', // Adjust based on your folder structure
+    });
+
+    const cloudinaryUrls = cloudinaryResult.resources.map((resource) => resource.secure_url);
+
+    // Get all images from your database
+    const databaseImages = await prisma.image.findMany();
+
+    // Find images in the database that no longer exist on Cloudinary
+    const imagesToDelete = databaseImages.filter((dbImage) => !cloudinaryUrls.includes(dbImage.url));
+
+    // Delete these images from the database
+    for (const image of imagesToDelete) {
+      await prisma.image.delete({
+        where: { id: image.id },
+      });
+      console.log(`Deleted image ${image.id} from database`);
+    }
+
+    return { message: 'Database synced with Cloudinary' };
+  } catch (error) {
+    console.error('Failed to sync database with Cloudinary', error);
+    throw new Error('Failed to sync database with Cloudinary');
+  }
+}

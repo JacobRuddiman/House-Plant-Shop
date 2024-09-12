@@ -22,6 +22,11 @@ const ManageLayout: React.FC<ManageLayoutProps> = ({ children }) => {
                 Manage Images
               </Link>
             </li>
+            <li>
+              <Link href="/manage/categories" className="btn btn-outline btn-primary">
+                Manage Categories
+              </Link>
+            </li>
           </ul>
         </nav>
         <div className="bg-white shadow-md rounded-lg p-6">

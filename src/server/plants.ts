@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from '../lib/prisma';
+import { PlantData } from '@/lib/types';
 
 interface CreatePlantInput {
   scientificName: string;
@@ -11,8 +12,23 @@ interface CreatePlantInput {
   price: number;
   discountPrice: number;
   count: number;
-  imageIds: number[]; // Update to use imageIds
+  imageIds: number[]; 
   rating: number;
+  categoryId: number; // New field for category
+}
+
+interface UpdatePlantInput {
+  id: number;
+  scientificName: string;
+  commonName: string;
+  genus: string;
+  species: string;
+  description: string;
+  price: number;
+  discountPrice: number;
+  count: number;
+  rating: number;
+  categoryId: number;
 }
 
 interface GetPlantsInput {
@@ -21,57 +37,87 @@ interface GetPlantsInput {
   genus?: string;
   minPrice?: number;
   maxPrice?: number;
+  isDiscounted?: boolean;
 }
+
+export async function updatePlant(data: PlantData) {
+  try {
+    const updatedPlant = await prisma.plant.update({
+      where: { id: data.id },
+      data: {
+        scientificName: data.scientificName,
+        commonName: data.commonName,
+        genus: data.genus,
+        species: data.species,
+        description: data.description,
+        price: data.price,
+        discountPrice: data.discountPrice,
+        count: data.count,
+        rating: Math.min(Math.max(data.rating, 0), 5),  // Adjust rating between 0 and 5
+        isDiscounted: data.isDiscounted,
+        category: {
+          connect: { id: data.categoryId ?? undefined },
+        },
+      },
+    });
+
+    return { updatedPlant };
+  } catch (error) {
+    console.error('Error updating plant:', error);
+    return { error: 'Failed to update plant' };
+  }
+}
+
 
 export async function getPlants(params: GetPlantsInput = {}) {
   try {
-    const { sort = 'scientificName', order = 'asc', genus, minPrice, maxPrice } = params;
+    const { sort = 'scientificName', order = 'asc', genus, minPrice, maxPrice, isDiscounted } = params;
     const query: any = {};
 
-    
-
-    // Filter by genus if provided
     if (genus) {
       query.genus = genus;
     }
 
-    // Filter by price range if provided and ensure values are valid numbers
-    if (typeof minPrice === 'number' && !isNaN(minPrice) && typeof maxPrice === 'number' && !isNaN(maxPrice)) {
-      query.price = { gte: minPrice, lte: maxPrice };
-    } else if (typeof minPrice === 'number' && !isNaN(minPrice)) {
+    if (typeof minPrice === 'number' && !isNaN(minPrice)) {
       query.price = { gte: minPrice };
-    } else if (typeof maxPrice === 'number' && !isNaN(maxPrice)) {
-      query.price = { lte: maxPrice };
     }
 
-    // Define the orderBy parameter based on the provided sort and order
+    if (typeof maxPrice === 'number' && !isNaN(maxPrice)) {
+      query.price = query.price ? { ...query.price, lte: maxPrice } : { lte: maxPrice };
+    }
+
+    if (isDiscounted) {
+      query.isDiscounted = true; // Add filter for discounted plants
+    }
+
     const orderBy: Record<string, 'asc' | 'desc'> = {};
     if (sort) {
       orderBy[sort] = order;
     }
 
-    console.log("SERVER GETPLANTS:", query)
-
     const plants = await prisma.plant.findMany({
       where: query,
       orderBy,
       include: {
-        images: true, // Include related images
+        images: true,  // Ensure related images are included
       },
     });
 
-    // Map the plants to include a primary image URL
-    const plantsWithImageUrl = plants.map(plant => ({
+    const plantsWithImageUrl: PlantData[] = plants.map((plant) => ({
       ...plant,
-      imageUrl: plant.images.length > 0 ? plant.images[0].url : '', // Get the first image URL or empty string if no images
+      price: plant.price.toNumber(), // Convert Decimal to number
+      discountPrice: plant.discountPrice.toNumber(), // Convert Decimal to number
+      imageUrl: plant.images.length > 0 ? plant.images[0].url : '', // Get first image URL or empty string
     }));
 
     return { plants: plantsWithImageUrl };
   } catch (error) {
-    console.error("Error fetching plants:", error);
+    console.error('Error fetching plants:', error);
     return { error: 'Failed to fetch plants' };
   }
 }
+
+
 
 export async function createPlant(data: CreatePlantInput) {
   try {
@@ -89,6 +135,9 @@ export async function createPlant(data: CreatePlantInput) {
         discountPrice: data.discountPrice,
         count: data.count,
         rating: adjustedRating,  // Use the adjusted rating
+        category: {
+          connect: { id: data.categoryId }, // Connect the plant to a category
+        },
         images: {
           connect: data.imageIds.map(id => ({ id })),
         },
@@ -129,25 +178,24 @@ export async function getGenuses() {
   }
 }
 
-
 export async function getPlant(id: number) {
   const plant = await prisma.plant.findUnique({
     where: { id },
-    include: {
-      images: {
-        orderBy: {
-          id: 'asc'
-        }
-      }
-    },
+    include: { images: true },
   });
 
   if (!plant) {
     throw new Error('Plant not found');
   }
 
-  return plant;
+  // Convert Decimal to number
+  return {
+    ...plant,
+    price: plant.price.toNumber(),
+    discountPrice: plant.discountPrice.toNumber(),
+  };
 }
+
 
 
 

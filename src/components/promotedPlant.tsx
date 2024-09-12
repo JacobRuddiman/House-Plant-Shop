@@ -14,6 +14,7 @@ interface Plant {
   discountPrice: number;
   count: number;
   imageUrl: string;
+  isDiscounted: boolean; // Ensure isDiscounted is part of the Plant interface
 }
 
 const PromotedPlants: React.FC = () => {
@@ -25,7 +26,7 @@ const PromotedPlants: React.FC = () => {
       const result = await getPlants();
       if (result.error) {
         setError(result.error);
-      } else if(result.plants){
+      } else if (result.plants) {
         const shuffled = result.plants.sort(() => 0.5 - Math.random());
         setSelectedPlants(shuffled.slice(0, 6));
       }
@@ -33,7 +34,7 @@ const PromotedPlants: React.FC = () => {
     fetchPlants();
   }, []);
 
-  const plantsToShow = [...selectedPlants, ...selectedPlants]; // Duplicate the plant list
+  const plantsToShow = [...selectedPlants, ...selectedPlants, ...selectedPlants, ...selectedPlants]; // Duplicate the plant list
 
   return (
     <div className="overflow-hidden mb-8 p-4">
@@ -45,7 +46,7 @@ const PromotedPlants: React.FC = () => {
           <div className="flex w-max animate-scroll">
             {plantsToShow.map((plant, index) => (
               <div key={index} className="flex-shrink-0 w-60 mx-2">
-                <PlantCard rating={0} {...plant} />
+                <PlantCard rating={0} {...plant} isDiscounted={plant.isDiscounted} />
               </div>
             ))}
           </div>
@@ -56,7 +57,7 @@ const PromotedPlants: React.FC = () => {
       <style jsx>{`
         @keyframes scroll {
           0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); } /* Adjusted to loop smoothly */
+          100% { transform: translateX(-50%); }
         }
         .animate-scroll {
           animation: scroll 60s linear infinite;

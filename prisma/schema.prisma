@@ -3,28 +3,48 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model Plant {
-  id             Int      @id @default(autoincrement())
+  id             Int            @id @default(autoincrement())
   scientificName String
   commonName     String
   genus          String
   species        String
   description    String
-  price          Float
-  discountPrice  Float
+  price          Decimal
+  discountPrice  Decimal
   count          Int
-  images         Image[]  // Relationship to Image model
   rating         Float
+  categoryId     Int?
+  isDiscounted   Boolean        @default(false)
+  images         Image[]
+  category       PlantCategory? @relation(fields: [categoryId], references: [id])
+  reviews        Review[]
 }
 
 model Image {
-  id        Int    @id @default(autoincrement())
-  url       String
-  plantId   Int?
-  plant     Plant?  @relation(fields: [plantId], references: [id])
+  id      Int    @id @default(autoincrement())
+  url     String
+  plantId Int?
+  plant   Plant? @relation(fields: [plantId], references: [id])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Float
+  comment   String
+  reviewer  String
+  plantId   Int
+  createdAt DateTime @default(now())
+  plant     Plant    @relation(fields: [plantId], references: [id])
+}
+
+model PlantCategory {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+  plants Plant[]
 }

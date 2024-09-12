@@ -11,6 +11,7 @@ const FilterBar: React.FC = () => {
     genus: searchParams.get('genus') || 'All',
     minPrice: searchParams.get('minPrice') || '',
     maxPrice: searchParams.get('maxPrice') || '',
+    isDiscounted: searchParams.get('isDiscounted') || '', // New filter for discounted plants
   });
 
   const [filters, setFilters] = useState<{ [key: string]: string }>(getInitialFilters());
@@ -49,7 +50,7 @@ const FilterBar: React.FC = () => {
   }, [router]);
 
   const handleChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const newValue = event.target.value;
+    const newValue = event.target.type === 'checkbox' ? (event.target as HTMLInputElement).checked ? 'true' : '' : event.target.value;
     setFilters(prev => {
       const newFilters = { ...prev, [field]: newValue };
       return newFilters;
@@ -99,6 +100,18 @@ const FilterBar: React.FC = () => {
             placeholder="Max"
             onKeyPress={handleKeyPress}
           />
+        </div>
+      </div>
+      <div>
+        <label className="block mb-2"></label>
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            checked={filters.isDiscounted === 'true'}
+            onChange={(e) => handleChange('isDiscounted')(e)}
+            className="toggle toggle-success"
+          />
+          <span className="ml-2">Discounted Plants</span>
         </div>
       </div>
       <button

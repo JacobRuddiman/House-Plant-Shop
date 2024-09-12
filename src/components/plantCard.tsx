@@ -13,6 +13,7 @@ interface PlantCardProps {
   count: number;
   imageUrl: string;
   rating: number;
+  isDiscounted: boolean; // Add this prop to check if the plant is discounted
   id: number;
 }
 
@@ -27,6 +28,7 @@ const PlantCard: React.FC<PlantCardProps> = ({
   count,
   imageUrl,
   rating,
+  isDiscounted, // Now handling this prop
   id,
 }) => {
   const stockMessage = count > 10 ? "In Stock" : `Only ${count} left`;
@@ -75,9 +77,13 @@ const PlantCard: React.FC<PlantCardProps> = ({
         </div>
         <div className="flex justify-between items-center mt-4">
           <div>
-            <p className="text-lg font-semibold">${price}</p>
-            {discountPrice < price && (
-              <p className="text-sm text-gray-500 line-through">${discountPrice}</p>
+            {isDiscounted ? (
+              <>
+                <p className="text-lg font-semibold text-green-600">${discountPrice}</p>
+                <p className="text-sm text-gray-500 line-through">${price}</p>
+              </>
+            ) : (
+              <p className="text-lg font-semibold">${price}</p>
             )}
           </div>
           <Link href={`/shop?genus=${genus}`} passHref>
