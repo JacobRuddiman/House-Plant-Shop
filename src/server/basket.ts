@@ -1,19 +1,14 @@
-// /app/actions/basketActions.ts
+// /app/actions/basket.ts
 "use server";
 import { cookies } from 'next/headers';
 
-// Define the Item interface
 interface Item {
   id: number;
   name: string;
   price: number;
   quantity: number;
-  // Add any other relevant properties for your items
 }
 
-/**
- * Fetch the current basket from cookies.
- */
 export async function getBasket(): Promise<Item[]> {
   const cookieStore = cookies();
   const basketCookie = cookieStore.get('basket');
@@ -21,16 +16,20 @@ export async function getBasket(): Promise<Item[]> {
   return basket;
 }
 
-/**
- * Add an item to the basket and update cookies.
- * @param {Item} item - The item to add to the basket.
- */
 export async function addToBasket(item: Item): Promise<number> {
   const cookieStore = cookies();
   const basket = await getBasket();
 
-  // Add the new item to the basket
-  basket.push(item);
+  // Check if the item already exists in the basket
+  const existingItemIndex = basket.findIndex(basketItem => basketItem.id === item.id);
+
+  if (existingItemIndex !== -1) {
+    // Instead of adding the quantity, replace the quantity with the new value
+    basket[existingItemIndex].quantity = item.quantity;
+  } else {
+    // If the item does not exist, add it to the basket
+    basket.push(item);
+  }
 
   // Update the basket cookie
   cookieStore.set('basket', JSON.stringify(basket), {
@@ -43,10 +42,6 @@ export async function addToBasket(item: Item): Promise<number> {
   return basket.length;
 }
 
-/**
- * Remove an item from the basket by ID and update cookies.
- * @param {number} itemId - The ID of the item to remove from the basket.
- */
 export async function removeFromBasket(itemId: number): Promise<number> {
   const cookieStore = cookies();
   let basket = await getBasket();
@@ -65,9 +60,6 @@ export async function removeFromBasket(itemId: number): Promise<number> {
   return basket.length;
 }
 
-/**
- * Clear the entire basket and update cookies.
- */
 export async function clearBasket(): Promise<number> {
   const cookieStore = cookies();
 

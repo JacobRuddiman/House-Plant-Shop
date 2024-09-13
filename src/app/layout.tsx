@@ -3,6 +3,7 @@ import NavBar from '@/components/navBar';
 import Footer from '@/components/footer';
 import '@/styles/globals.css';
 import Head from 'next/head';
+import { BasketProvider } from '@/context/basketContext';
 
 export default function RootLayout({
   children,
@@ -17,9 +18,11 @@ export default function RootLayout({
         <title>Plant Store</title>
       </Head>
       <body data-theme='mytheme'>
-        <NavBar />
-        <div className="min-h-screen">{children}</div> {/* Ensures footer is at the bottom */}
-        <Footer /> {/* Include the Footer component */}
+        <BasketProvider>
+          <NavBar />
+          <div className="min-h-screen">{children}</div> {/* Ensures footer is at the bottom */}
+         <Footer /> {/* Include the Footer component */}
+        </BasketProvider>
       </body>
     </html>
   );

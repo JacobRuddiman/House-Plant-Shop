@@ -14,7 +14,7 @@ const NavBar = () => {
       <div className="flex-none text-white">
         <ul className="menu menu-horizontal p-0 items-center text-base">
           <GenusDropdown/>
-          <li><Link href="/shop">Offers</Link></li>
+          <li><Link href="/shop?isDiscounted=true">Offers</Link></li>
           <li><Link href="/about">About</Link></li>
           <li><Link href="/contact">Contact</Link></li>
           <li>

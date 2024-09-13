@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation';
 import ImageGallery from '@/components/productImageGallery';
 import PlantCard from '@/components/plantCard';
 import PlantReviews from '@/components/plantReviews';
+import AddToBasket from '@/components/addToBasket';
 
 interface Plant {
   id: number;
@@ -130,7 +131,8 @@ const ProductPage = () => {
               <div></div>
             </div>
             <p className="mt-4">{plant.count > 10 ? 'In Stock' : `Only ${plant.count} left`}</p>
-            <button className="mt-4 btn btn-primary">Add to Cart</button>
+            <AddToBasket plantId={plant.id} name={plant.commonName} price={plant.isDiscounted ? plant.discountPrice : plant.price} />
+
           </div>
           {/* Description */}
       <section className="mb-8 mt-8">
