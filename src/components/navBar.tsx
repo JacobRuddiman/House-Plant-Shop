@@ -13,6 +13,7 @@ const NavBar = () => {
       </div>
       <div className="flex-none text-white">
         <ul className="menu menu-horizontal p-0 items-center text-base">
+          <li><Link href="/shop">Shop</Link></li>
           <GenusDropdown/>
           <li><Link href="/shop?isDiscounted=true">Offers</Link></li>
           <li><Link href="/about">About</Link></li>
