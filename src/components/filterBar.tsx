@@ -18,28 +18,29 @@ const FilterBar: React.FC = () => {
   const [filters, setFilters] = useState<{ [key: string]: string }>(getInitialFilters());
   const [genuses, setGenuses] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchGenusesAndCategories = useCallback(async () => {
-    setLoading(true); // Start loading
     try {
       // Fetch Genuses
+      console.log("Fetching Genuses...");
       const genusesResponse = await getGenuses();
       const fetchedGenuses = genusesResponse.genuses || [];
+      console.log("Genuses:", fetchedGenuses);
       setGenuses(['All', ...fetchedGenuses]);
-  
+
       // Fetch Categories
+      console.log("Fetching Categories...");
       const categoriesResponse = await getCategories();
       const fetchedCategories = categoriesResponse.categories || [];
+      console.log("Categories:", fetchedCategories);
       setCategories(['All', ...fetchedCategories]);
+
     } catch (error) {
       console.error("Failed to fetch genuses or categories:", error);
-    } finally {
-      setLoading(false); // Stop loading
+      setError("Failed to load filters.");
     }
   }, []);
-
-  
 
   useEffect(() => {
     fetchGenusesAndCategories(); // Fetch both genuses and categories when the component mounts
@@ -74,12 +75,10 @@ const FilterBar: React.FC = () => {
     updateURL(filters);
   };
 
-  if (loading) {
-    return <div>Loading filters...</div>;
-  }
-
   return (
     <div className="flex flex-col space-y-4 my-8 px-4">
+      {error && <div className="text-red-500">{error}</div>}
+
       {/* Genus Filter */}
       <div>
         <label className="block mb-2">Genus:</label>
