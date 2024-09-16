@@ -25,6 +25,7 @@ const FilterBar: React.FC = () => {
       // Fetch Genuses
       console.log("Fetching Genuses...");
       const genusesResponse = await getGenuses();
+      console.log("Fetched:", genusesResponse)
       const fetchedGenuses = genusesResponse.genuses || [];
       console.log("Genuses:", fetchedGenuses);
       setGenuses(['All', ...fetchedGenuses]);
