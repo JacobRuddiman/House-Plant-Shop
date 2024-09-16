@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { getGenuses } from '@/server/plants';
+import { getGenuses, getCategories } from '@/server/plants'; // Import getCategories and getGenuses
 
 const FilterBar: React.FC = () => {
   const router = useRouter();
@@ -9,30 +9,41 @@ const FilterBar: React.FC = () => {
 
   const getInitialFilters = (): { [key: string]: string } => ({
     genus: searchParams.get('genus') || 'All',
+    category: searchParams.get('category') || 'All',
     minPrice: searchParams.get('minPrice') || '',
     maxPrice: searchParams.get('maxPrice') || '',
-    isDiscounted: searchParams.get('isDiscounted') || '', // New filter for discounted plants
+    isDiscounted: searchParams.get('isDiscounted') || '', 
   });
 
   const [filters, setFilters] = useState<{ [key: string]: string }>(getInitialFilters());
-  const [genuses, setGenuses] = useState<string[]>(['All']);
+  const [genuses, setGenuses] = useState<string[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchGenuses = useCallback(async () => {
-    console.log("Fetching genuses...");
+  const fetchGenusesAndCategories = useCallback(async () => {
+    setLoading(true); // Start loading
     try {
-      const response = await getGenuses();
-      const fetchedGenuses = response.genuses || [];
-      console.log("Genuses fetched:", fetchedGenuses);
+      // Fetch Genuses
+      const genusesResponse = await getGenuses();
+      const fetchedGenuses = genusesResponse.genuses || [];
       setGenuses(['All', ...fetchedGenuses]);
+  
+      // Fetch Categories
+      const categoriesResponse = await getCategories();
+      const fetchedCategories = categoriesResponse.categories || [];
+      setCategories(['All', ...fetchedCategories]);
     } catch (error) {
-      console.error("Failed to fetch genuses:", error);
-      setGenuses(['All']);
+      console.error("Failed to fetch genuses or categories:", error);
+    } finally {
+      setLoading(false); // Stop loading
     }
   }, []);
 
+  
+
   useEffect(() => {
-    fetchGenuses();
-  }, [fetchGenuses]); // Fetch on mount
+    fetchGenusesAndCategories(); // Fetch both genuses and categories when the component mounts
+  }, [fetchGenusesAndCategories]);
 
   useEffect(() => {
     setFilters(getInitialFilters()); // Update filters when searchParams change
@@ -46,29 +57,30 @@ const FilterBar: React.FC = () => {
       }
     });
     router.push(`/shop?${params.toString()}`);
-    console.log("CLIENT Updating URL");
   }, [router]);
 
   const handleChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const newValue = event.target.type === 'checkbox' ? (event.target as HTMLInputElement).checked ? 'true' : '' : event.target.value;
-    setFilters(prev => {
-      const newFilters = { ...prev, [field]: newValue };
-      return newFilters;
-    });
+    setFilters(prev => ({ ...prev, [field]: newValue }));
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
-      updateURL(filters); // Only update URL on Enter for price inputs
+      updateURL(filters); 
     }
   };
 
   const handleUpdateClick = () => {
-    updateURL(filters); // Update URL when the update button is clicked
+    updateURL(filters);
   };
+
+  if (loading) {
+    return <div>Loading filters...</div>;
+  }
 
   return (
     <div className="flex flex-col space-y-4 my-8 px-4">
+      {/* Genus Filter */}
       <div>
         <label className="block mb-2">Genus:</label>
         <select
@@ -81,6 +93,22 @@ const FilterBar: React.FC = () => {
           ))}
         </select>
       </div>
+
+      {/* Category Filter */}
+      <div>
+        <label className="block mb-2">Category:</label>
+        <select
+          value={filters.category}
+          onChange={(e) => handleChange('category')(e)}
+          className="input input-bordered w-full h-8"
+        >
+          {categories.map(category => (
+            <option key={category} value={category}>{category}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Price Filter */}
       <div>
         <label className="block mb-2">Price Range:</label>
         <div className="flex space-x-2">
@@ -102,8 +130,9 @@ const FilterBar: React.FC = () => {
           />
         </div>
       </div>
+
+      {/* Discounted Filter */}
       <div>
-        <label className="block mb-2"></label>
         <div className="flex items-center">
           <input
             type="checkbox"
@@ -114,6 +143,7 @@ const FilterBar: React.FC = () => {
           <span className="ml-2">Discounted Plants</span>
         </div>
       </div>
+
       <button
         onClick={handleUpdateClick}
         className="btn mt-4"

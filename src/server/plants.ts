@@ -35,10 +35,13 @@ interface GetPlantsInput {
   sort?: 'scientificName' | 'price' | 'rating';
   order?: 'asc' | 'desc';
   genus?: string;
+  category?: string;  // Add category filter
   minPrice?: number;
   maxPrice?: number;
   isDiscounted?: boolean;
+  search?: string;  // Add search term filter
 }
+
 
 export async function updatePlant(data: PlantData) {
   try {
@@ -71,11 +74,17 @@ export async function updatePlant(data: PlantData) {
 
 export async function getPlants(params: GetPlantsInput = {}) {
   try {
-    const { sort = 'scientificName', order = 'asc', genus, minPrice, maxPrice, isDiscounted } = params;
+    const { sort = 'scientificName', order = 'asc', genus, category, minPrice, maxPrice, isDiscounted, search } = params;
     const query: any = {};
 
     if (genus) {
       query.genus = genus;
+    }
+
+    if (category) {
+      query.category = {
+        name: category, // Ensure you're filtering by the category name
+      };
     }
 
     if (typeof minPrice === 'number' && !isNaN(minPrice)) {
@@ -87,7 +96,15 @@ export async function getPlants(params: GetPlantsInput = {}) {
     }
 
     if (isDiscounted) {
-      query.isDiscounted = true; // Add filter for discounted plants
+      query.isDiscounted = true;
+    }
+
+    if (search) {
+      query.OR = [
+        { scientificName: { contains: search, mode: 'insensitive' } },
+        { commonName: { contains: search, mode: 'insensitive' } },
+        { genus: { contains: search, mode: 'insensitive' } },
+      ];
     }
 
     const orderBy: Record<string, 'asc' | 'desc'> = {};
@@ -99,7 +116,8 @@ export async function getPlants(params: GetPlantsInput = {}) {
       where: query,
       orderBy,
       include: {
-        images: true,  // Ensure related images are included
+        images: true,
+        category: true, // Ensure the category is included
       },
     });
 
@@ -116,6 +134,8 @@ export async function getPlants(params: GetPlantsInput = {}) {
     return { error: 'Failed to fetch plants' };
   }
 }
+
+
 
 
 
@@ -162,21 +182,7 @@ export async function deletePlant(id: number) {
   }
 }
 
-export async function getGenuses() {
-  console.log("Server: Calling getGenuses");
-  try {
-    const genuses = await prisma.plant.findMany({
-      distinct: ['genus'],
-      select: { genus: true },
-    });
-    const genusNames = genuses.map(plant => plant.genus).sort();
-    console.log("SERVER GETGENUSES:", {genuses : genusNames})
-    return { genuses: genusNames };
-  } catch (error) {
-    console.error("Server: Error fetching genuses:", error);
-    return { error: 'Failed to fetch genuses' };
-  }
-}
+
 
 export async function getPlant(id: number) {
   const plant = await prisma.plant.findUnique({
@@ -201,7 +207,6 @@ export async function getPlant(id: number) {
 
 export async function getRelatedPlants(genus: string, price: number, maxRelatedPlants = 6) {
   try {
-    console.log(`Fetching related plants for genus: ${genus}, price: ${price}`);
 
     // Fetch plants of the same genus sorted by price proximity, including images
     const relatedPlantsByGenus = await prisma.plant.findMany({
@@ -221,13 +226,11 @@ export async function getRelatedPlants(genus: string, price: number, maxRelatedP
       take: maxRelatedPlants,
     });
 
-    console.log(`Related plants by genus found: ${relatedPlantsByGenus.length}`);
 
     let allRelatedPlants = [...relatedPlantsByGenus];
 
     // If we have fewer than the required number of related plants, fetch additional plants
     if (relatedPlantsByGenus.length < maxRelatedPlants) {
-      console.log(`Fetching additional plants because only ${relatedPlantsByGenus.length} plants were found`);
 
       const additionalPlants = await prisma.plant.findMany({
         where: {
@@ -251,7 +254,6 @@ export async function getRelatedPlants(genus: string, price: number, maxRelatedP
         take: maxRelatedPlants - relatedPlantsByGenus.length,
       });
 
-      console.log(`Additional plants found: ${additionalPlants.length}`);
 
       // Combine both lists
       allRelatedPlants = [...allRelatedPlants, ...additionalPlants];
@@ -271,13 +273,11 @@ export async function getRelatedPlants(genus: string, price: number, maxRelatedP
         take: maxRelatedPlants - allRelatedPlants.length,
       });
 
-      console.log(`Random plants found: ${randomPlants.length}`);
       allRelatedPlants = [...allRelatedPlants, ...randomPlants];
     }
 
     // Shuffle the combined list
     const shuffledPlants = shuffleArray(allRelatedPlants);
-    console.log(`Returning ${shuffledPlants.length} plants after shuffling`);
 
     return shuffledPlants;
   } catch (error) {
@@ -291,3 +291,33 @@ export async function getRelatedPlants(genus: string, price: number, maxRelatedP
 function shuffleArray(array: any[]) {
   return array.sort(() => Math.random() - 0.5);
 }
+
+
+export async function getGenuses() {
+  try {
+    const genuses = await prisma.plant.findMany({
+      distinct: ['genus'],
+      select: { genus: true },
+    });
+    const genusNames = genuses.map(plant => plant.genus);
+    return { genuses: genusNames };
+  } catch (error) {
+    console.error("Error fetching genuses:", error);
+    return { error: "Failed to fetch genuses" };
+  }
+}
+
+
+export async function getCategories() {
+  try {
+    const categories = await prisma.plantCategory.findMany({
+      select: { name: true },  // Fetching only the name field
+    });
+    const categoryNames = categories.map((category) => category.name);
+    return { categories: categoryNames };
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    return { error: "Failed to fetch categories" };
+  }
+}
+

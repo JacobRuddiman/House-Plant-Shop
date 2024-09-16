@@ -23,7 +23,7 @@ const PromotedPlants: React.FC = () => {
 
   useEffect(() => {
     async function fetchPlants() {
-      const result = await getPlants();
+      const result = await getPlants({}); // Pass an empty object as default params
       if (result.error) {
         setError(result.error);
       } else if (result.plants) {
