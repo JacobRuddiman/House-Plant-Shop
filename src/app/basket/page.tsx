@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { BasketContext } from '@/context/basketContext';
 import { getPlant } from '@/server/plants';
 import AddToBasket from '@/components/addToBasket';
+import Link from 'next/link';
 
 interface BasketItem {
   id: number;
@@ -79,11 +80,13 @@ const BasketPage: React.FC = () => {
               {basketWithImages.map((item) => (
                 <tr key={item.id} className="bg-white rounded-lg">
                   <td className="px-4 py-2 text-center">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="w-32 h-48 object-cover rounded-lg" // 3:4 aspect ratio, larger size
-                    />
+                    <Link href={`/product/${item.id}`} passHref>
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-32 h-48 object-cover rounded-lg cursor-pointer" // 3:4 aspect ratio, larger size
+                      />
+                    </Link>
                   </td>
                   <td className="px-4 py-2">{item.name}</td>
                   <td className="px-4 py-2">${item.price.toFixed(2)}</td>

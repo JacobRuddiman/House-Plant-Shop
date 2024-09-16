@@ -62,11 +62,13 @@ const PlantCard: React.FC<PlantCardProps> = ({
       <div className="card-body p-4 flex flex-col justify-between">
         <div>
           <h2 className="card-title flex-col items-start">
-            <Link href={`/product/${id}`} passHref>
+            <Link className='w-full'  href={`/product/${id}`} passHref>
               <div className="flex-row flex justify-between w-full cursor-pointer">
                 <div>{commonName}</div>
-                <div className={`badge ${badgeColor} custom-badge flex-col items-center text-center ml-auto`}>
-                  <span className="badge-count">{stockMessage}</span>
+                <div className='justify-end flex'>
+                  <div className={`badge ${badgeColor} custom-badge flex-col items-center text-center ml-auto`}>
+                    <span className="badge-count">{stockMessage}</span>
+                  </div>
                 </div>
               </div>
             </Link>

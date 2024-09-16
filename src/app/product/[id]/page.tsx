@@ -21,7 +21,7 @@ interface Plant {
   count: number;
   images: { id: number; url: string; plantId: number | null }[];
   rating: number;
-  isDiscounted: boolean; // Add isDiscounted property to Plant
+  isDiscounted: boolean;
 }
 
 const ProductPage = () => {
@@ -102,10 +102,10 @@ const ProductPage = () => {
   const imageUrls = plant.images.map(image => image.url);
 
   return (
-    <div className="container mr-auto p-4">
-      <div className="flex">
+    <div className="w-screen"> {/* Full screen width container */}
+      <div className="flex w-full p-4"> {/* Full width */}
         {/* Image Gallery on the Left */}
-        <div className="flex-1">
+        <div className="flex-1 mt-2 h-auto">
           <ImageGallery images={imageUrls}></ImageGallery>
         </div>
 
@@ -117,71 +117,77 @@ const ProductPage = () => {
               {plant.commonName}
             </h1>
             <p className="text-2xl my-2">{plant.genus} {plant.species}</p>
-            <p className='my-2'> {renderStars(plant.rating)} </p>
+            <div className="my-2 flex"> {renderStars(plant.rating)} </div>
           </header>
 
           <div className="mb-8">
-            <div className="flex justify-between items-center">
+            <div className="flex items-center">
               <div>
-                <p className="text-2xl font-bold">${plant.price}</p>
-                {plant.discountPrice < plant.price && (
-                  <p className="text-sm text-gray-500 line-through">${plant.discountPrice}</p>
+                {/* Price display logic */}
+                {plant.isDiscounted ? (
+                  <>
+                    <p className="text-3xl font-bold text-red-600">${plant.discountPrice.toFixed(2)}</p>
+                    <p className="text-sm text-gray-500 line-through">${plant.price.toFixed(2)}</p>
+                  </>
+                ) : (
+                  <p className="text-3xl font-bold">${plant.price.toFixed(2)}</p>
                 )}
               </div>
-              <div></div>
             </div>
             <p className="mt-4">{plant.count > 10 ? 'In Stock' : `Only ${plant.count} left`}</p>
-            <AddToBasket plantId={plant.id} name={plant.commonName} price={plant.isDiscounted ? plant.discountPrice : plant.price} />
-
+            <div className="flex">
+              <AddToBasket plantId={plant.id} name={plant.commonName} price={plant.isDiscounted ? plant.discountPrice : plant.price} />
+            </div>
           </div>
-          {/* Description */}
-      <section className="mb-8 mt-8">
-        <h2 className="text-2xl font-bold mb-4">Description</h2>
-        <p>{plant.description}</p>
-      </section>
 
-      {/* Specifications */}
-      <section className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">Specifications</h2>
-        <ul>
-          <li><strong>Genus:</strong> {plant.genus}</li>
-          <li><strong>Species:</strong> {plant.species}</li>
-          {/* Additional specifications */}
-        </ul>
-      </section>
+          {/* Description */}
+          <section className="mb-8 mt-8">
+            <h2 className="text-2xl font-bold mb-4">Description</h2>
+            <p>{plant.description}</p>
+          </section>
+
+          {/* Specifications */}
+          <section className="mb-8">
+            <h2 className="text-2xl font-bold mb-4">Specifications</h2>
+            <ul>
+              <li><strong>Genus:</strong> {plant.genus}</li>
+              <li><strong>Species:</strong> {plant.species}</li>
+            </ul>
+          </section>
         </div>
       </div>
 
       {/* Related Products */}
-      <section className="mt-16">
-        <h2 className="text-3xl font-bold mb-4">Related Products</h2>
-        <div className="flex gap-4">
-        {relatedPlants.map((relatedPlant) => {
-          const imageUrl = relatedPlant.images && relatedPlant.images.length > 0 ? relatedPlant.images[0].url : '';
-          return (
-            <PlantCard
-              key={relatedPlant.id}
-              id={relatedPlant.id}
-              scientificName={relatedPlant.scientificName}
-              commonName={relatedPlant.commonName}
-              genus={relatedPlant.genus}
-              species={relatedPlant.species}
-              description={relatedPlant.description}
-              price={relatedPlant.price}
-              discountPrice={relatedPlant.discountPrice}
-              count={relatedPlant.count}
-              imageUrl={imageUrl}
-              rating={relatedPlant.rating}
-              isDiscounted={relatedPlant.discountPrice < relatedPlant.price} // Add isDiscounted
-            />
-          );
-        })}
+      <section className="mt-16 w-full">
+        <div className='my-4'>
+          <h2 className="text-3xl font-bold mb-4">Related Products</h2>
+          <div className="flex gap-4">
+            {relatedPlants.map((relatedPlant) => {
+              const imageUrl = relatedPlant.images && relatedPlant.images.length > 0 ? relatedPlant.images[0].url : '';
+              return (
+                <PlantCard
+                  key={relatedPlant.id}
+                  id={relatedPlant.id}
+                  scientificName={relatedPlant.scientificName}
+                  commonName={relatedPlant.commonName}
+                  genus={relatedPlant.genus}
+                  species={relatedPlant.species}
+                  description={relatedPlant.description}
+                  price={relatedPlant.price}
+                  discountPrice={relatedPlant.discountPrice}
+                  count={relatedPlant.count}
+                  imageUrl={imageUrl}
+                  rating={relatedPlant.rating}
+                  isDiscounted={relatedPlant.isDiscounted}
+                />
+              );
+            })}
+          </div>
         </div>
       </section>
       <section>
         <PlantReviews plantId={plant.id}/>
       </section>
-
     </div>
   );
 };
