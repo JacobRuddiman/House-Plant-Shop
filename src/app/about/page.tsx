@@ -6,59 +6,35 @@ const AboutPage: React.FC = () => {
   return (
     <div className="w-3/4 mx-auto text-center p-8 min-h-screen flex flex-col justify-center items-center">
       <h1 className="text-4xl font-extrabold mb-8 text-gray-800 tracking-wide">
-        About the website
+        About the Website
       </h1>
 
-      <div className="space-y-12 text-left">
-        {/* Section 1: Our Mission */}
+      <div className="space-y-12">
+        {/* Section 1: Website Mission */}
         <section>
-          <h2 className="text-3xl font-bold text-gray-700 mb-4"></h2>
           <p className="text-lg text-gray-600 mb-4">
-            This website is a simple shop webfront to show my ability in creating a responsive website using a number of technologies, many of which I use regularly at PromptBros.
+            This website serves as a demonstration of my ability to build responsive and modern web applications, using the latest technologies I regularly employ at PromptBros. I chose Heroku for cost reasons,
+            and this along with Postgres were new to me for this project.
           </p>
-          <ul className="list-disc list-inside text-left text-gray-600">
+          <ul className="list-disc list-inside text-gray-600">
             <li>Next.js with server actions</li>
-            <li>Prisma ORM</li>
-            <li>Heroku</li>
+            <li>Tailwind for styling</li>
+            <li>Prisma ORM for database management</li>
+            <li>Heroku for hosting</li>
+            <li>Postgres for the database</li>
           </ul>
         </section>
 
-        {/* Section 2: Our Values */}
+        {/* Section 2: Website Features */}
         <section>
-          <h2 className="text-3xl font-bold text-gray-700 mb-4">Values</h2>
-          <p className="text-lg text-gray-600 mb-4">
-            We believe in integrity, transparency, and respect. Our core values guide everything we do, ensuring we remain committed to ethical and sustainable practices.
-          </p>
-          <ul className="list-disc list-inside text-left text-gray-600">
-            <li>Integrity and transparency</li>
-            <li>Respect for customers and employees</li>
-            <li>Commitment to sustainability</li>
-          </ul>
-        </section>
-
-        {/* Section 3: Our Team */}
-        <section>
-          <h2 className="text-3xl font-bold text-gray-700 mb-4">Our Team</h2>
-          <p className="text-lg text-gray-600 mb-4">
-            Our team consists of experienced professionals who are passionate about what they do. Together, we work to bring our vision to life and continuously strive to exceed expectations.
-          </p>
-          <ul className="list-disc list-inside text-left text-gray-600">
-            <li>Experts in their respective fields</li>
-            <li>Collaborative and supportive culture</li>
-            <li>Driven by passion and innovation</li>
-          </ul>
-        </section>
-
-        {/* Section 4: Our History */}
-        <section>
-          <h2 className="text-3xl font-bold text-gray-700 mb-4">Our History</h2>
-          <p className="text-lg text-gray-600 mb-4">
-            Founded in 2010, we have grown from a small startup to an established brand with a reputation for excellence. Over the years, we have achieved significant milestones.
-          </p>
-          <ul className="list-disc list-inside text-left text-gray-600">
-            <li>Founded in 2010 with a small team</li>
-            <li>Expanded our services nationwide</li>
-            <li>Recognized for our industry-leading solutions</li>
+          <h2 className="text-3xl font-bold text-gray-700 mb-4">Website Features</h2>
+          <p>The website has all the features of a shop front, excluding checkout</p>
+          <ul className="list-disc list-inside text-gray-600">
+            <li>Product Listings</li>
+            <li>Product Search and Filter</li>
+            <li>Basket</li>
+            <li>User Reviews and Ratings</li>
+            <li>Backend management pages for adding and managing plants</li>
           </ul>
         </section>
       </div>
