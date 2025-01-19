@@ -112,7 +112,7 @@ export async function syncDatabaseWithCloudinary() {
     // Get all images from Cloudinary
     const cloudinaryResult = await cloudinary.api.resources({
       type: 'upload',
-      prefix: 'your_folder_name/', // Adjust based on your folder structure
+      prefix: 'images/', // Adjust based on your folder structure
     });
 
     const cloudinaryUrls = cloudinaryResult.resources.map((resource) => resource.secure_url);

@@ -6,6 +6,11 @@ import { syncDatabaseWithCloudinary } from '@/server/images';
 const SyncToCloudinary: React.FC = () => {
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
 
+  console.log('Cloud name:', process.env.CLOUDINARY_CLOUD_NAME);
+  console.log('API key:', process.env.CLOUDINARY_API_KEY);
+  console.log('API secret:', process.env.CLOUDINARY_API_SECRET);
+
+
   const handleSync = async () => {
     setSyncStatus('Syncing...');
     try {
