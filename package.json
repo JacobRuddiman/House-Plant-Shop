@@ -8,12 +8,13 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "prisma:migrate": "npx prisma migrate dev --name init",
     "prisma:generate": "npx prisma generate",
-    "prisma:deploy": "npm run prisma:migrate && npm run prisma:generate"
+    "prisma:deploy": "npm run prisma:migrate && npm run prisma:generate",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.16.0",
