@@ -1,7 +1,8 @@
 "use server";
 
 import prisma from '../lib/prisma';
-import { v2 as cloudinary, UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
+import { v2 as UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
+import cloudinary from "../lib/cloudinary"
 
 
 

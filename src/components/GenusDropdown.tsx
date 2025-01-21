@@ -13,15 +13,25 @@ const GenusDropdown: React.FC<GenusDropdownProps> = () => {
 
   useEffect(() => {
     const fetchGenuses = async () => {
-      const result = await getGenuses();
-      if (!result.error) {
-        setGenuses(result.genuses || []);
+      try {
+        const result = await getGenuses();
+        if (!result.error) {
+          setGenuses(result.genuses || []);
+        } else {
+          console.error("Error fetching genuses:", result.error);
+          setGenuses([]); // Fallback to empty array if there's an error
+        }
+      } catch (error) {
+        console.error("An unexpected error occurred:", error);
+        setGenuses([]); // Fallback to empty array in case of exceptions
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
-
+  
     fetchGenuses();
   }, []);
+  
 
   const handleGenusClick = (genus: string) => {
     router.push(`/shop?genus=${genus}`);
